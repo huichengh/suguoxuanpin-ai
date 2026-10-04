@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #f5f7f6;
+  --panel: #ffffff;
+  --border: #e3e8e6;
+  --brand: #257354;
+  --brand-light: #f0f9f4;
+  --text: #1a2b24;
+  --muted: #6b7d76;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #c8d2ce; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #a8b8b2; }
+
+@layer components {
+  .card {
+    @apply bg-white rounded-lg border border-[#e3e8e6];
+  }
+  .card-title {
+    @apply text-[15px] font-semibold text-[#1a2b24] px-5 py-3.5 border-b border-[#eef2f0] flex items-center justify-between;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-md text-[13px] font-medium
+           transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap;
+  }
+  .btn-primary {
+    @apply btn bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800;
+  }
+  .btn-secondary {
+    @apply btn bg-white text-[#33473f] border border-[#d5ded9] hover:bg-[#f4f8f6] hover:border-brand-300;
+  }
+  .btn-ghost {
+    @apply btn text-brand-700 hover:bg-brand-50;
+  }
+  .btn-danger {
+    @apply btn bg-[#d94a4a] text-white hover:bg-[#c13f3f];
+  }
+  .input {
+    @apply w-full px-3 py-2 rounded-md border border-[#d5ded9] text-[13px] bg-white
+           focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100;
+  }
+  .label {
+    @apply block text-[12px] font-medium text-[#55665f] mb-1.5;
+  }
+  .table-th {
+    @apply px-3.5 py-2.5 text-left text-[12px] font-semibold text-[#55665f]
+           bg-[#f7faf9] border-b border-[#e3e8e6] whitespace-nowrap;
+  }
+  .table-td {
+    @apply px-3.5 py-2.5 text-[13px] border-b border-[#f0f3f2] text-[#2c3d36];
+  }
+  .tag {
+    @apply inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium;
+  }
+}
+
+.demo-label {
+  @apply inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px]
+         bg-[#fff4e8] text-[#a35d16] border border-[#f5d9b8];
+}
+
+.dashed-box {
+  @apply border-2 border-dashed border-[#d5ded9] rounded-lg p-6 text-center;
+}
