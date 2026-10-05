@@ -4,9 +4,17 @@ export const API_BASE = '/api'
 
 export const http = axios.create({ baseURL: API_BASE, timeout: 60000 })
 
+// 令牌同时放在两个位置，两个位置都能被服务端读到：
+//   Authorization —— 标准做法，本地与直连部署时使用
+//   X-Auth-Token   —— 自定义头。部分网关会改写 Authorization 头（追加自己的凭据），
+//                     导致服务端截取到的令牌被污染而验签失败；自定义头不受此影响。
+// 服务端优先读 X-Auth-Token，缺失时回退到 Authorization。
 http.interceptors.request.use((cfg) => {
   const token = localStorage.getItem('suguo_token')
-  if (token) cfg.headers.Authorization = `Bearer ${token}`
+  if (token) {
+    cfg.headers.Authorization = `Bearer ${token}`
+    cfg.headers['X-Auth-Token'] = token
+  }
   return cfg
 })
 
