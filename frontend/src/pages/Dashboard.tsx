@@ -119,7 +119,7 @@ export default function Dashboard() {
             className="btn-primary"
             onClick={() => window.dispatchEvent(new CustomEvent('suguo:open-demo'))}
           >
-            ▶ 一键 3 分钟自动演示
+            ▶ 一键 2 分钟自动演示
           </button>
           <button className="btn-secondary" onClick={() => setShowDemo(true)}>
             手动演示动线

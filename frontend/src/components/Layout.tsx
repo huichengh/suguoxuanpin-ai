@@ -167,7 +167,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               className="btn-primary text-[12px] px-3 py-1.5"
               title="自动播放 8 步完整业务闭环"
             >
-              ▶ 3 分钟自动演示
+              ▶ 2 分钟自动演示
             </button>
             {store && (
               <div className="flex items-center gap-1.5 text-[12px] text-[#55665f]">

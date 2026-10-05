@@ -13,11 +13,13 @@ export interface DemoAction {
 }
 
 /**
- * 3 分钟自动演示
+ * 自动演示
  *
  * 8 步走完「数据 → 算法 → AI → 管理决策 → 人机协同」完整闭环。
- * 每步自动跳转 + 解说字幕 + 语音播报，评委无需操作。
- * 总时长约 165 秒，控制在 3 分钟内。
+ * 每步自动跳转并显示解说字幕，评委无需操作。
+ * 不含语音播报——解说词以字幕形式呈现，由评审自行阅读，
+ * 停留时长按默读速度计算（见下方常量说明）。
+ * 全程约 2 分 10 秒。
  */
 
 interface Step {
@@ -25,7 +27,7 @@ interface Step {
   title: string
   subtitle: string
   path: string
-  /** 解说词（同时作为字幕与语音播报内容） */
+  /** 解说词，以字幕形式显示供评审阅读；停留时长按其字数计算 */
   narration: string
   /** 这一步要展示的数据亮点 */
   highlights: string[]
@@ -42,8 +44,7 @@ const STEPS: Step[] = [
     subtitle: '华润苏果（南京江宁黄金海岸广场店）',
     path: '/stores',
     narration:
-      '演示从门店画像开始。当前门店是华润苏果南京江宁黄金海岸广场店，社区购物中心店，营业面积 3200 平米。' +
-      '注意这里所有人口与 POI 字段都显示待接入——平台不会编造不存在的数据。',
+      '演示从门店开始。这是华润苏果南京江宁黄金海岸广场店，社区购物中心，营业面积 3200 平米。人口与 POI 字段全部显示待接入——平台不编造不存在的数据。',
     highlights: ['社区门店定位', '画像数据待接入', '不编造人口数据'],
     cue: '强调"数据不足时平台明确说不足"，这是数据治理能力的体现',
   },
@@ -53,10 +54,7 @@ const STEPS: Step[] = [
     subtitle: '四维评分模型，区分附件参考与系统重算',
     path: '/category-health',
     narration:
-      '品类健康度用四个维度打分：销量贡献 30%、毛利贡献 30%、库存周转 20%、坪效 20%。' +
-      '这里有个关键细节：库存周转天数越低越好，所以做了逆向标准化。' +
-      '结果是生鲜蔬果 100 分排第一，纺织服装 15.2 分排最后——周转 87 天、坪效只有 270。' +
-      '页面下方还展示了系统重算与附件参考结果的差异，平台不修改任何一方。',
+      '品类健康度用四个维度打分：销量 30%、毛利 30%、周转 20%、坪效 20%。周转天数越低越好，做了逆向标准化。生鲜蔬果 100 分居首，纺织服装 15.2 分垫底，周转 87 天、坪效 270。',
     highlights: ['生鲜蔬果 100 分 · 优秀', '纺织服装 15.2 分 · 需重点优化', '周转天数逆向标准化'],
     cue: '重点讲逆向标准化这个技术细节，以及双数据来源的治理设计',
   },
@@ -66,9 +64,7 @@ const STEPS: Step[] = [
     subtitle: '2-6 个对象多维加权比较，权重可实时调整',
     path: '/compare',
     narration:
-      '选品比较中心支持三种模式：品类比较、小类比较、SKU 比较。' +
-      '权重可以实时调整，调整后立即重算。' +
-      '小类层因为缺少毛利和周转数据，模型自动降级为两维——平台不做数据摊派。',
+      '比较中心支持品类、小类、单品三种模式，权重可实时调整。小类层缺毛利与周转数据，模型自动降级为两维，不做数据摊派。',
     highlights: ['三种比较模式', '权重实时可调', '缺数据自动降级为两维'],
     cue: '如果时间紧，这一步可以只讲 10 秒，重点在下一步的实际操作',
     preAction: {
@@ -83,10 +79,7 @@ const STEPS: Step[] = [
     subtitle: '鸡蛋、牛奶、垃圾袋、豆腐、拖把 五选一',
     path: '/compare',
     narration:
-      '现在做一次真实的小类比较。选中鸡蛋、牛奶、垃圾袋、豆腐、拖把五个商品。' +
-      '结果显示鸡蛋 100 分排名第一——销量 2018 件，是拖把的 3 倍以上。' +
-      '豆腐 0 分排名末位，建议退出。' +
-      '每个结论都附带数据依据、最大风险，以及什么情况下结论会反转。',
+      '小类比较实战：鸡蛋、牛奶、垃圾袋、豆腐、拖把五选一。鸡蛋 100 分居首，销量 2018 件，是拖把的三倍多。豆腐 0 分垫底，建议退出。每条结论都附数据依据与风险。',
     highlights: ['鸡蛋 100 分 · 销售冠军', '豆腐 0 分 · 建议退出', '每条结论可解释、可反驳'],
     cue: '这是本次升级的核心亮点，务必现场演示并指出排名差距',
     preAction: {
@@ -100,10 +93,7 @@ const STEPS: Step[] = [
     subtitle: 'Apriori 实时重算 vs 附件参考结果',
     path: '/association',
     narration:
-      '关联陈列基于 5000 笔交易篮、70 个商品项实时计算。' +
-      '购物篮按交易号加商品名称构建，因为演示数据里商品编码高度离散。' +
-      '这里要特别注意：附件预置了 20 条规则，其中只有 11 条通过当前阈值，9 条未通过。' +
-      '平台把两份结果分开存放、分别标注来源，未通过的附件规则也原样保留不删不改。',
+      '关联陈列基于 5000 笔交易篮、70 个商品实时计算。附件预置 20 条规则，只有 11 条通过当前阈值。两份结果分开存放、分别标注，未通过的也原样保留。',
     highlights: ['5000 笔交易篮 · 70 个商品', '附件 20 条中仅 11 条达标', '双来源分开标注'],
     cue: '这是最能体现数据治理能力的一页，务必讲清"为什么不删附件数据"',
   },
@@ -113,10 +103,7 @@ const STEPS: Step[] = [
     subtitle: '历史实线 + 预测虚线 + 置信区间带',
     path: '/forecast',
     narration:
-      '需求预测用 12 期历史加 4 期预测。' +
-      '历史是实线，预测是虚线，中间还给出了置信区间带。' +
-      '注意标签——这是模拟预测结果，平台不会为它标注任何预测精度。' +
-      '点击重跑按钮可以用平台自己的移动平均模型实际算一遍，结论会不一样，这个差异本身就是诚实的表现。',
+      '需求预测用 12 期历史外推 4 期，实线是历史、虚线是预测，中间是置信区间带。标签已注明是模拟结果，平台不标注任何预测精度。',
     highlights: ['12 期历史 + 4 期预测', '模拟结果如实标注', '可重跑真实模型对比'],
     cue: '强调平台区分"附件模拟值"和"平台实算值"，不混为一谈',
   },
@@ -126,11 +113,7 @@ const STEPS: Step[] = [
     subtitle: '五分组输出，每项都有多维数据依据',
     path: '/agent',
     narration:
-      '现在让 AI 生成综合选品方案。' +
-      '输出分成五组：优先扩充、建议保持、重点观察、建议精简、建议退出。' +
-      '每一项都必须给出多维数据依据——健康度、销量贡献、毛利贡献、周转、坪效、缺货、需求趋势。' +
-      '只看一个健康分是不给出结论的。' +
-      '回答还严格按六个段落组织：结论、关键数据依据、分析、建议、风险限制、决策状态。',
+      'AI 生成综合方案，输出五组：优先扩充、建议保持、重点观察、建议精简、建议退出。每项至少四个维度的数据依据，只看一个健康分不给结论。',
     highlights: ['五分组方案', '每项 ≥4 维数据依据', '标准六段回答模板'],
     cue: '让 AI 现场回答一个真实问题，比看静态页面更有说服力',
     preAction: {
@@ -145,47 +128,45 @@ const STEPS: Step[] = [
     subtitle: 'Level 3 建议必须人工审批，AI 不执行',
     path: '/approvals',
     narration:
-      '最后是人机协同。AI 建议分三级：信息提示、经营建议、高影响建议。' +
-      '像 SKU 退出、大规模精简、供应商调整这类高影响操作，必须走人工审批。' +
-      'AI 不会自动下采购单、不会改价格、不会删商品，只能形成待审批建议。' +
-      '每条审批都记录了申请人、审批人、意见、时间和数据依据，可追溯。',
+      '人机协同。AI 建议分三级，SKU 退出这类高影响操作必须人工审批。AI 不下采购单、不改价格、不删商品，只形成待审批建议，全程可追溯。',
     highlights: ['三级审批机制', 'Level 3 强制人工审批', '全流程可追溯'],
     cue: '结尾停在这一页，强调"AI 辅助决策、人工最终确认"的核心定位',
   },
 ]
 
 /**
- * 演示时长完全由解说词决定：
- *   停留秒数 = 解说词朗读时间 + 缓冲
- * 中文 TTS 在 rate=1.05 下约每秒 5.5 字；语音播完后会用 `onend` 拿到的
- * 真实时长校正，所以不同机器的语速差异不会影响演示节奏。
+ * 演示时长按「解说词默读所需时间」计算。
+ *
+ * 本版不再朗读解说词，字幕由评委自行阅读，因此基准从口播速度调整为默读速度：
+ *   停留秒数 = 解说词字数 / 默读速度 + 浏览缓冲
+ *
+ * 默读速度取每秒 5 字——比常速口播（约 6 字/秒）慢，留出辨认数字的余量。
+ * 单步封顶 20 秒：字数最多的那一步也不至于拖沓；
+ * 全程 8 步合计约 2 分 10 秒。
  */
-const CHARS_PER_SEC = 5.5
-/** 语音结束后留出的缓冲，让评委看完最后一句 */
-const TAIL_BUFFER = 2.5
-/** 单步最短 / 最长停留，避免过短显得仓促或过长显得拖沓 */
-const MIN_STEP = 10
-const MAX_STEP = 38
+const READ_CHARS_PER_SEC = 5
+/** 留给评委看页面数据的时间（换页动画、图表渲染） */
+const BROWSE_BUFFER = 1.5
+/** 单步停留上限，防止长文案把某一步拖得过长 */
+const MAX_STEP = 20
 
-/**
- * 每步停留时长 = 解说词朗读时间 + 缓冲。
- * 关闭语音时退化为按字数估算（而非写死的秒数），
- * 这样调整解说词后时长也会自动跟着变。
- */
-function estimateSeconds(text: string): number {
+/** 每步停留秒数。中文按字数计，英文与数字按半个字计。 */
+function readSeconds(text: string): number {
   const cjk = (text.match(/[一-鿿]/g) || []).length
   const other = text.length - cjk
-  const units = cjk + other * 0.5          // 英文/数字按半个字计
-  return Math.round(Math.min(MAX_STEP, Math.max(MIN_STEP, units / CHARS_PER_SEC + TAIL_BUFFER)))
+  const units = cjk + other * 0.5
+  return Math.min(MAX_STEP, Math.round(units / READ_CHARS_PER_SEC + BROWSE_BUFFER))
 }
+
+/** 各步停留时长。解说词改动后自动跟随，无需手工调整。 */
+const STEP_SECONDS = STEPS.map((s) => readSeconds(s.narration))
 
 export default function DemoPlayer({ onClose }: { onClose: () => void }) {
   const nav = useNavigate()
   const [running, setRunning] = useState(false)
   const [stepIdx, setStepIdx] = useState(0)
-  const [left, setLeft] = useState(() => estimateSeconds(STEPS[0].narration))
+  const [left, setLeft] = useState(() => readSeconds(STEPS[0].narration))
   const [elapsed, setElapsed] = useState(0)
-  const [voice, setVoice] = useState(true)
   const [finished, setFinished] = useState(false)
   const timerRef = useRef<number | null>(null)
 
@@ -193,42 +174,9 @@ export default function DemoPlayer({ onClose }: { onClose: () => void }) {
   const stepRef = useRef(stepIdx)      // 计时器读当前步，不依赖 React 状态时序
   stepRef.current = stepIdx
 
-  /** 每步的实际停留秒数：初始按解说词字数估算，语音播完后被真实时长校正 */
-  const [durations, setDurations] = useState<number[]>(() =>
-    STEPS.map((s) => estimateSeconds(s.narration)))
-  /** 真实语音时长（秒）。未播报时为 null，页面显示估算值。 */
-  const [spokenSecs, setSpokenSecs] = useState<(number | null)[]>(() =>
-    STEPS.map(() => null))
-  const durationsRef = useRef(durations)
-  durationsRef.current = durations
-  const spokenSecsRef = useRef(spokenSecs)
-  spokenSecsRef.current = spokenSecs
+  const stepSeconds = (i: number) => STEP_SECONDS[i] ?? 20
+  const TOTAL_SECONDS = STEP_SECONDS.reduce((a, b) => a + b, 0)
 
-  const stepSeconds = (i: number) => durationsRef.current[i] ?? 20
-  const totalSeconds = () => STEPS.reduce((s, _, i) => s + stepSeconds(i), 0)
-
-  /**
-   * 播报解说词。
-   * onend 时用真实语音时长校正本步剩余时间 —— 这是「时间跟着语音走」的关键：
-   * 语速快/慢、语音引擎差异都能自适应。
-   */
-  const speak = useCallback((text: string, onDone?: (spokenSec: number) => void) => {
-    if (!voice || !('speechSynthesis' in window)) { onDone?.(0); return }
-    try {
-      window.speechSynthesis.cancel()
-      const u = new SpeechSynthesisUtterance(text)
-      u.lang = 'zh-CN'
-      u.rate = 1.05
-      const t0 = performance.now()
-      u.onend = () => onDone?.((performance.now() - t0) / 1000)
-      // 兜底：某些环境不触发 onend，按估算时长触发
-      const est = estimateSeconds(text) * 1000 + 1500
-      setTimeout(() => { try { window.speechSynthesis.cancel() } catch { /* noop */ } }, est)
-      window.speechSynthesis.speak(u)
-    } catch {
-      onDone?.(0)
-    }
-  }, [voice])
 
   const goStep = useCallback((idx: number, auto = true) => {
     const i = Math.max(0, Math.min(STEPS.length - 1, idx))
@@ -240,29 +188,8 @@ export default function DemoPlayer({ onClose }: { onClose: () => void }) {
     } catch { /* 忽略 */ }
     setStepIdx(i)
     setLeft(stepSeconds(i))
-    if (auto) {
-      nav(STEPS[i].path)
-      // 语音结束后按真实时长校正本步停留时间
-      speak(STEPS[i].narration, (spokenSec) => {
-        if (spokenSec <= 0) return
-        const rounded = Math.round(spokenSec * 10) / 10
-        setSpokenSecs((prev) => {
-          const next = [...prev]; next[i] = rounded
-          return next
-        })
-        const target = Math.round(
-          Math.min(MAX_STEP, Math.max(MIN_STEP, spokenSec + TAIL_BUFFER)))
-        setDurations((prev) => {
-          if (Math.abs(prev[i] - target) < 1) return prev
-          const next = [...prev]; next[i] = target
-          return next
-        })
-        if (stepRef.current === i) {
-          setLeft((l) => Math.max(0.5, l - spokenSec))
-        }
-      })
-    }
-  }, [nav, speak])
+    if (auto) nav(STEPS[i].path)
+  }, [nav])
 
   const stop = useCallback(() => {
     if (timerRef.current) {
@@ -270,7 +197,6 @@ export default function DemoPlayer({ onClose }: { onClose: () => void }) {
       timerRef.current = null
     }
     setRunning(false)
-    if ('speechSynthesis' in window) window.speechSynthesis.cancel()
   }, [])
 
   const start = useCallback(() => {
@@ -298,7 +224,6 @@ export default function DemoPlayer({ onClose }: { onClose: () => void }) {
       setLeft((l) => Math.max(0, l - TICK / 1000))
       setElapsed((e) => e + TICK / 1000)
 
-      // 用动态时长：语音播完后会被真实时长校正
       if (acc >= stepSeconds(cur) * 1000) {
         acc = 0
         if (cur < STEPS.length - 1) {
@@ -307,7 +232,6 @@ export default function DemoPlayer({ onClose }: { onClose: () => void }) {
         } else {
           setRunning(false)
           setFinished(true)
-          if ('speechSynthesis' in window) window.speechSynthesis.cancel()
         }
       }
     }, TICK)
@@ -330,7 +254,7 @@ export default function DemoPlayer({ onClose }: { onClose: () => void }) {
 
   const curSeconds = stepSeconds(stepIdx)
   const done = STEPS.slice(0, stepIdx).reduce((s, _, i) => s + stepSeconds(i), 0)
-  const pct = Math.min(100, ((done + (curSeconds - left)) / totalSeconds()) * 100)
+  const pct = Math.min(100, ((done + (curSeconds - left)) / TOTAL_SECONDS) * 100)
 
   return (
     <div
@@ -346,26 +270,14 @@ export default function DemoPlayer({ onClose }: { onClose: () => void }) {
           <div>
             <div className="text-[14px] font-semibold text-white leading-tight">AI 选品全流程自动演示</div>
             <div className="text-[11px] text-white/45 leading-tight">
-              共 {STEPS.length} 步 · 约 {Math.floor(totalSeconds() / 60)} 分 {Math.round(totalSeconds() % 60)} 秒（跟随语音长度）
+              共 {STEPS.length} 步 · 约 {Math.floor(TOTAL_SECONDS / 60)} 分 {Math.round(TOTAL_SECONDS % 60)} 秒
             </div>
           </div>
         </div>
 
         <div className="ml-auto flex items-center gap-3">
-          <label className="flex items-center gap-1.5 text-[12px] text-white/70 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={voice}
-              onChange={(e) => {
-                setVoice(e.target.checked)
-                if (!e.target.checked && 'speechSynthesis' in window) window.speechSynthesis.cancel()
-              }}
-              className="accent-[#57ad84]"
-            />
-            语音解说
-          </label>
           <span className="text-[13px] text-white/70 tabular-nums">
-            {Math.round(elapsed)}s / {Math.round(totalSeconds())}s
+            {Math.round(elapsed)}s / {TOTAL_SECONDS}s
           </span>
           {!running && !finished && (
             <button onClick={start} className="btn-primary">▶ 开始演示</button>
@@ -422,7 +334,7 @@ export default function DemoPlayer({ onClose }: { onClose: () => void }) {
               <p className="text-[14px] text-white/60 leading-relaxed mb-6">
                 完整走通了「数据 → 算法 → AI → 管理决策 → 人机协同」闭环。
                 <br />
-                全程用时 {elapsed} 秒，所有数字均来自数据库实时计算。
+                全程 {TOTAL_SECONDS} 秒，所有数字均来自数据库实时计算。
               </p>
               <div className="flex items-center justify-center gap-3">
                 <button onClick={start} className="btn-primary">重新演示</button>
@@ -445,15 +357,11 @@ export default function DemoPlayer({ onClose }: { onClose: () => void }) {
               <div className="rounded-xl bg-white/10 border border-white/20 p-5 mb-5">
                 <div className="text-[11px] text-white/40 mb-2 flex items-center justify-between gap-3">
                   <span className="flex items-center gap-1.5">
-                    <span>🔊</span> 解说词
+                    <span>📝</span> 解说词
                     <span className="text-white/30">（{step.narration.length} 字）</span>
                   </span>
                   <span className="text-white/40">
-                    {spokenSecs[stepIdx] != null ? (
-                      <>实测语音 {spokenSecs[stepIdx]}s ＋ 缓冲 {TAIL_BUFFER}s ＝ 停留 {stepSeconds(stepIdx)}s</>
-                    ) : (
-                      <>按字数估算停留 {stepSeconds(stepIdx)}s（语音结束后自动校正）</>
-                    )}
+                    按默读速度停留 {stepSeconds(stepIdx)}s
                   </span>
                 </div>
                 <p className="text-[15px] text-white/90 leading-[1.9]">{step.narration}</p>
