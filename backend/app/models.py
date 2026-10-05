@@ -452,3 +452,63 @@ class AgentConversation(Base):
     content = Column(Text)
     tools_used = Column(JSON)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+class DailyCategoryStat(Base):
+    """日期维度事实表：品类 × 日 的销量事实，由交易明细聚合。
+
+    为什么需要这张表：
+    交易明细是「逐笔」粒度，直接按日期统计需要每次全表扫描。
+    聚合为「品类 × 日」后，日期规律分析可直接查询，且口径固定可复算。
+
+    天气字段说明：
+    附件数据集不含温度、湿度字段，因此这些列保持 NULL。
+    平台不填估算值——天气影响分析在数据接入前直接返回「数据不足」。
+    列已建好，外部气象数据接入后写入即可启用分析，无需改结构。
+    """
+    __tablename__ = "daily_category_stats"
+    id = Column(Integer, primary_key=True)
+    category_id = Column(Integer, ForeignKey("categories.id"), index=True)
+    stat_date = Column(Date, nullable=False, index=True)   # 统计日期
+
+    # --- 从交易明细可直接聚合的真实字段 ---
+    sales_qty = Column(Float, default=0)          # 销量（件）
+    sales_amount = Column(Float, default=0)       # 销售额（元）
+    transaction_count = Column(Integer, default=0)  # 成交笔数
+    sku_count = Column(Integer, default=0)        # 在售 SKU 数
+    total_quantity = Column(Float, default=0)     # 件数合计（同 sales_qty，保留语义清晰）
+
+    # --- 天气字段：附件未提供，保持 NULL，不填估算值 ---
+    temp_max = Column(Float)         # 当日最高气温（℃），未接入
+    temp_min = Column(Float)         # 当日最低气温（℃），未接入
+    humidity = Column(Float)         # 当日平均相对湿度（%），未接入
+    weather_type = Column(String(30))  # 晴/多云/雨/雪，未接入
+    precipitation = Column(Float)    # 降水量（mm），未接入
+
+    # --- 由日期直接派生的确定性字段（非估算）---
+    weekday = Column(Integer)         # 0=周一 … 6=周日
+    day_type = Column(String(20))     # weekday / weekend
+    week_of_year = Column(Integer)    # ISO 周次
+    month = Column(String(10))        # YYYY-MM
+    season = Column(String(10))       # 春/夏/秋/冬（按气象划分）
+
+    __table_args__ = (UniqueConstraint("category_id", "stat_date", name="uq_daily_cat_date"),)
+
+
+class WeatherObservation(Base):
+    """气象观测表 —— 预留，附件无气象数据。
+
+    存在的意义是把「天气影响分析」的数据依赖显式化：
+    接口会检查本表是否有数据，无数据时返回待接入说明，
+    而不是静默返回空结果或用估算值填充。
+    """
+    __tablename__ = "weather_observations"
+    id = Column(Integer, primary_key=True)
+    obs_date = Column(Date, nullable=False, index=True)   # 观测日期
+    temp_max = Column(Float)
+    temp_min = Column(Float)
+    temp_avg = Column(Float)
+    humidity = Column(Float)          # 平均相对湿度（%）
+    precipitation = Column(Float)     # 降水量（mm）
+    weather_type = Column(String(30))
+    data_source = Column(String(100))  # 数据来源标注
+    created_at = Column(DateTime, default=datetime.utcnow)

@@ -11,6 +11,7 @@ import AbcShelf from './pages/AbcShelf'
 import CategoryHealth from './pages/CategoryHealth'
 import Association from './pages/Association'
 import Forecast from './pages/Forecast'
+import DatePattern from './pages/DatePattern'
 import Stores from './pages/Stores'
 import PrivateLabel from './pages/PrivateLabel'
 import NewProducts from './pages/NewProducts'
@@ -35,6 +36,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <Route path="/category-health" element={<Protected><CategoryHealth /></Protected>} />
       <Route path="/association" element={<Protected><Association /></Protected>} />
       <Route path="/forecast" element={<Protected><Forecast /></Protected>} />
+      <Route path="/date-pattern" element={<Protected><DatePattern /></Protected>} />
       <Route path="/stores" element={<Protected><Stores /></Protected>} />
       <Route path="/private-label" element={<Protected><PrivateLabel /></Protected>} />
       <Route path="/new-products" element={<Protected><NewProducts /></Protected>} />

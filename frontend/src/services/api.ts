@@ -55,6 +55,16 @@ export const api = {
   updateStore: (payload: any) => http.patch(`/stores-ops/${payload.store_id}`, payload).then((r) => r.data),
   compareStores: (ids: number[]) => http.post('/stores-ops/compare', { store_ids: ids }).then((r) => r.data),
 
+  // 日期维度与天气
+  datePatternStatus: () => http.get('/date-pattern/status').then((r) => r.data),
+  rebuildDatePattern: () => http.post('/date-pattern/rebuild').then((r) => r.data),
+  datePatterns: (categoryId?: number) =>
+    http.get('/date-pattern/patterns', { params: { category_id: categoryId } }).then((r) => r.data),
+  dateAdvice: (categoryId?: number) =>
+    http.get('/date-pattern/advice', { params: { category_id: categoryId } }).then((r) => r.data),
+  dateDaily: (categoryId?: number, limit = 120) =>
+    http.get('/date-pattern/daily', { params: { category_id: categoryId, limit } }).then((r) => r.data),
+
   // 小类分析
   subcategories: (categoryId?: number, keyword?: string) =>
     http.get('/subcategories', {

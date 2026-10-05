@@ -24,6 +24,7 @@ const NAV: { group: string; items: NavItem[] }[] = [
       { path: '/abc-shelf', label: '小类结构分析', icon: '▦', desc: 'ABC分类与货架空间优化' },
       { path: '/association', label: '关联陈列分析', icon: '⇗', desc: 'Apriori购物篮与关联网络' },
       { path: '/forecast', label: '需求预测', icon: '◷', desc: '历史/预测趋势与置信区间' },
+      { path: '/date-pattern', label: '日期与天气', icon: '☀', desc: '星期/月份规律与备货参考' },
     ],
   },
   {

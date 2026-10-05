@@ -14,10 +14,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from .api.routers import admin, agent, analysis, auth, data, stores, subcategory
+from .api.routers import admin, agent, analysis, auth, data, date_pattern, stores, subcategory
 from .config import DEFAULT_STORE, DEMO_DISCLAIMER, DEMO_SOURCE
 from .database import Base, engine, SessionLocal
-from .models import Category, DataUpload, Store
+from .models import Category, DailyCategoryStat, DataUpload, Store
 
 # 前端构建产物目录。优先用 frontend/dist；打包部署时可能放在 backend/static。
 _FRONTEND_CANDIDATES = [
@@ -52,6 +52,7 @@ app.include_router(auth.router)
 app.include_router(analysis.router)
 app.include_router(stores.router)
 app.include_router(subcategory.router)
+app.include_router(date_pattern.router)
 app.include_router(data.router)
 app.include_router(agent.router)
 app.include_router(agent.new_router)
@@ -83,6 +84,28 @@ def on_startup():
         except Exception as e:
             print(f"[苏果智选] 演示数据导入失败：{e}")
             print("[苏果智选] 请通过前端「数据中心」手动上传项目数据集。")
+
+    # 日期维度事实表随演示数据一并生成。
+    # 原因：线上部署每次重启都会重建数据库，若改为懒加载，
+    # 用户打开页面会先看到「尚未生成」的空状态，需再点一次按钮。
+    # 聚合 1763 条耗时不到 1 秒，放在启动阶段更合理。
+    db2 = SessionLocal()
+    try:
+        from .services.date_pattern import rebuild_daily_stats
+        need_daily = db2.query(DailyCategoryStat).count() == 0
+    except Exception:
+        need_daily = False
+    finally:
+        db2.close()
+
+    if need_daily:
+        try:
+            db3 = SessionLocal()
+            r = rebuild_daily_stats(db3)
+            db3.close()
+            print(f"[苏果智选] 日期维度数据已生成：{r['rows']} 条（{r['days']} 天）")
+        except Exception as e:
+            print(f"[苏果智选] 日期维度数据生成失败：{e}")
 
 
 @app.get("/api/health")
